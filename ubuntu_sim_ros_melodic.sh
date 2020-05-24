@@ -7,6 +7,9 @@
 ## - Common dependencies libraries and tools as defined in `ubuntu_sim_common_deps.sh`
 ## - ROS Melodic (including Gazebo9)
 ## - MAVROS
+##
+## Method:
+## source ./ubuntu_sim_common_deps.sh
 
 if [[ $(lsb_release -sc) == *"xenial"* ]]; then
   echo "OS version detected as $(lsb_release -sc) (16.04)."
