@@ -100,7 +100,7 @@ fi
 #sudo bash -c "$install_geo"
 
 # Alternate Install Geographiclib
-./src/mavros/mavros/scripts/install_geographiclib_datasets.sh #Should work?
+sudo ./src/mavros/mavros/scripts/install_geographiclib_datasets.sh #Should work?
 
 ## Build!
 catkin build
