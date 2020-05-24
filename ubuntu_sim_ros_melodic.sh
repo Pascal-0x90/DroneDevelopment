@@ -18,6 +18,8 @@ if [[ $(lsb_release -sc) == *"xenial"* ]]; then
   return 1;
 fi
 
+echo "Adding user to group [dialout]"
+sudo usermod -a -G dialout $USER
 echo "Downloading dependent script 'ubuntu_sim_common_deps.sh'"
 # Source the ubuntu_sim_common_deps.sh script directly from github
 common_deps=$(wget https://raw.githubusercontent.com/PX4/Devguide/master/build_scripts/ubuntu_sim_common_deps.sh -O -)
