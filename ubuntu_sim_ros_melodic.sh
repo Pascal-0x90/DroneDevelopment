@@ -100,7 +100,7 @@ fi
 #sudo bash -c "$install_geo"
 
 # Alternate Install Geographiclib
-./src/mavros/mavros/scripts/install_geographiclib_datasets.sh #Should work?
+sudo ./src/mavros/mavros/scripts/install_geographiclib_datasets.sh #Should work?
 
 ## Build!
 catkin build
@@ -113,8 +113,11 @@ eval $catkin_ws_source
 # Needed or rosrun cant find nodes from this workspace
 source devel/setup.bash
 
-# Go to the firmware directory
+# Clone PX4 Firmware and Go to the firmware directory
 clone_dir=~/src
+mkdir $clone_dir
+cd $clone_dir
+git clone https://github.com/PX4/Firmware.git
 cd $clone_dir/Firmware
 
 
