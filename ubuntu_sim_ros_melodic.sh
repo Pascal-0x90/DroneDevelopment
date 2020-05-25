@@ -11,6 +11,7 @@
 ## Method:
 ## source ./ubuntu_sim_common_deps.sh
 
+UAVDIR=$(pwd)
 if [[ $(lsb_release -sc) == *"xenial"* ]]; then
   echo "OS version detected as $(lsb_release -sc) (16.04)."
   echo "ROS Melodic requires at least Ubuntu 18.04."
@@ -182,6 +183,6 @@ echo "#!/bin/sh" > ~/.vnc/xstartup.turbovnc
 echo "xsetroot -solid grey" >> ~/.vnc/xstartup.turbovnc
 echo "/usr/bin/lxsession -s Lubuntu &" >> ~/.vnc/xstartup.turbovnc
 chmod a+x ~/.vnc/xstartup.turbovnc
-sudo rm -rf ~/UAV/DroneDevelopment/*.deb
+sudo rm -rf $UAVDIR/*.deb
 
 sudo reboot
