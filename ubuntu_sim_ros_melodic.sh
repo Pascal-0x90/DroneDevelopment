@@ -123,4 +123,65 @@ cd $clone_dir
 git clone https://github.com/PX4/Firmware.git
 cd $clone_dir/Firmware
 
+# Install TurboVNC and noVNC
+export SOURCEFORGE="https://sourceforge.net/projects"
+export TURBOVNC_VERSION="2.2.3"
+export VIRTUALGL_VERSION="2.6.3"
+export LIBJPEG_VERSION="2.0.4"
+export NOVNC_VERSION="1.0.0"
+export WEBSOCKIFY_VERSION="0.8.0"
 
+curl -fsSL -O ${SOURCEFORGE}/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb \
+        -O ${SOURCEFORGE}/libjpeg-turbo/files/${LIBJPEG_VERSION}/libjpeg-turbo-official_${LIBJPEG_VERSION}_amd64.deb \
+        -O ${SOURCEFORGE}/virtualgl/files/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_amd64.deb
+sudo dpkg -i *.deb && \
+	rm -f /tmp/*.deb && \
+	sudo sed -i 's/$host:/unix:/g' /opt/TurboVNC/bin/vncserver
+sudo apt-get update -y
+sudo apt-get install -y emacs lsof wget curl git htop less build-essential terminator make cmake net-tools lubuntu-desktop xvfb
+sudo perl -pi -e 's/^lightdm:(.*)(\/bin\/false)$/lightdm:$1\/bin\/bash/' /etc/passwd
+
+export DISPLAY=":0"
+# Install display manager
+sudo apt-get install lightdm -y
+sudo service lightdm stop
+sudo /opt/VirtualGL/bin/vglserver_config
+sudo service lightdm restart
+
+# Critical to wait a bit: you can't run xhost too fast after x starts
+sleep 5
+#
+# This xhost command is key to getting Lubuntu working properly with nvidia-driven GPU support.
+#
+sudo su - lightdm -c "xhost +si:localuser:root"
+sudo perl -pi -e 's/^lightdm:(.*)(\/bin\/bash)$/lightdm:$1\/bin\/false/' /etc/passwd
+echo "export DISPLAY=:1" >> ~/.bashrc
+echo "export PATH=:/opt/VirtualGL/bin:/opt/TurboVNC/bin:$PATH" >> ~/.bashrc
+
+# Novnc
+sudo apt -y install novnc websockify python-numpy
+sudo mkdir /etc/ssl
+cd /etc/ssl
+sudo openssl req -x509 -nodes -newkey rsa:2048 -keyout novnc.pem -out novnc.pem -days 365 
+sudo chmod 644 novnc.pem 
+# /etc/ssl/novnc.pem
+
+cd /tmp
+sudo curl -fsSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.tar.gz | sudo tar -xzf - -C /opt && \
+    sudo curl -fsSL https://github.com/novnc/websockify/archive/v${WEBSOCKIFY_VERSION}.tar.gz | sudo tar -xzf - -C /opt && \
+    sudo mv /opt/noVNC-${NOVNC_VERSION} /opt/noVNC && \
+    sudo chmod -R a+w /opt/noVNC && \
+    sudo mv /opt/websockify-${WEBSOCKIFY_VERSION} /opt/websockify && \
+    cd /opt/websockify && sudo make && \
+    cd /opt/noVNC/utils && \
+    sudo ln -s /opt/websockify
+sudo mv /etc/xdg/autostart/light-locker.desktop /etc/xdg/autostart/light-locker.desktop_bak
+sudo mv /etc/xdg/autostart/xfce4-power-manager.desktop /etc/xdg/autostart/xfce4-power-manager.desktop_bak
+sudo apt install xfce4-session xfce4-panel -y
+echo "#!/bin/sh" > ~/.vnc/xstartup.turbovnc
+echo "xsetroot -solid grey" >> ~/.vnc/xstartup.turbovnc
+echo "/usr/bin/lxsession -s Lubuntu &" >> ~/.vnc/xstartup.turbovnc
+chmod a+x ~/.vnc/xstartup.turbovnc
+sudo rm -rf ~/UAV/DroneDevelopment/*.deb
+
+sudo reboot
