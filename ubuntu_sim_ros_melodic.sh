@@ -9,6 +9,7 @@
 ## - MAVROS
 ##
 ## Method:
+## sudo usermod -a -G dialout $USER # Then relog after this
 ## source ./ubuntu_sim_common_deps.sh
 
 UAVDIR=$(pwd)
